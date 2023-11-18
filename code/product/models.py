@@ -1,6 +1,6 @@
 import uuid
 from django.db import models
-
+from django.utils.text import slugify
 
 
 class GeneralInfo(models.Model):
@@ -15,6 +15,10 @@ class GeneralInfo(models.Model):
 
     def __str__(self) -> str:
         return self.name[:200]
+    
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
 
 class CategoryBase(GeneralInfo):
@@ -39,7 +43,7 @@ class CategorySub(CategoryBase):
         db_table = 'category_sub'
 
     def __str__(self) -> str:
-        return f'{self.parent_category.name[:70]} > {self.name[:200]}'
+        return f'{self.parent.name[:70]} > {self.name[:200]}'
 
 
 class Product(GeneralInfo):
