@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from product.models import Category, CategorySub, Product
-from product.serializeres import CategorySerializer, ProductSerializer
+from product.serializeres import CategorySerializer, ProductSerializer, ProductDetailSerializer
 
 
 class ListCategory(APIView):
@@ -53,7 +53,7 @@ class ProductView(APIView):
         
         try:
             product = Product.objects.get(id=product_id)
-            serializer = ProductSerializer(product, many=False)
+            serializer = ProductDetailSerializer(product, many=False)
             return Response({
                 'product': serializer.data
             }, status=status.HTTP_200_OK)

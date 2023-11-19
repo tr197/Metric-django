@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from product.models import Category, CategorySub, Product, ProductImages
+from product.models import Category, CategorySub, Product, ProductOptions
 
 
 class CategorySubSerializer(serializers.ModelSerializer):
@@ -19,7 +19,29 @@ class CategorySerializer(serializers.ModelSerializer):
         
         
 class ProductSerializer(serializers.ModelSerializer):
+    price = serializers.SerializerMethodField()
+    
     class Meta:
         model = Product
-        fields = ['id', 'name', 'price', 'main_image_url', 'other_image_urls', 'description']
+        fields = ['id', 'name', 'price', 'main_image_url', 'description']
         
+    def get_price(self, obj):
+        return obj.calculate_price()
+
+
+class ProductOptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductOptions
+        fields = ['name', 'description', 'price']
+        
+        
+class ProductDetailSerializer(serializers.ModelSerializer):
+    price = serializers.SerializerMethodField()
+    options = ProductOptionSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = Product
+        fields = ['id', 'name', 'price', 'image_urls', 'description', 'options']
+        
+    def get_price(self, obj):
+        return obj.calculate_price()

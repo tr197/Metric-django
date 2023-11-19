@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from django.db.models import Min
 from django.utils.text import slugify
 from app.settings import APP_URL
 
@@ -61,12 +62,22 @@ class Product(GeneralInfo):
     def main_image_url(self):
         return APP_URL + self.image.url
 
-    def other_image_urls(self):
+    def __other_image_urls(self):
         return [
             f'{APP_URL}{item.image.url}'
             for item 
             in self.other_images.all()
             ]
+        
+    def image_urls(self):
+        return [self.main_image_url()] + self.__other_image_urls()
+        
+    def calculate_price(self):
+        options = self.options.all()
+        if len(options) == 0:
+            return self.price
+        min_price = options.aggregate(min_price=Min('price'))
+        return min_price['min_price']
 
 
 class ProductImages(models.Model):
@@ -75,3 +86,17 @@ class ProductImages(models.Model):
 
     class Meta:
         db_table = 'product_image'
+        
+        
+
+class ProductOptions(models.Model):
+    product = models.ForeignKey(Product, related_name='options', on_delete=models.CASCADE)
+    name = models.CharField(null=True, blank=True)
+    description = models.CharField(max_length=255, null=True, blank=True)
+    price = models.IntegerField(null=True, blank=True, default=999999999)
+
+    class Meta:
+        db_table = 'product_option'
+        
+        
+                
