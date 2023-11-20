@@ -1,6 +1,26 @@
 version: '3.8'
 
 services:
+
+  vue-app:
+    image: trinh199/app:metric-vue.1.0
+    container_name: metric-vue-app-container
+    ports: 
+    - "8899:80"
+
+
+  django-app:
+    image: trinh199/app:metric-django.1.0
+    container_name: metric-django-app-container
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data/media:/media
+    env_file:
+      - .env.build
+    networks:
+      - metric-app-network
+
   postgres-database:
     image: postgres
     container_name: metric-postgres-container
@@ -12,6 +32,8 @@ services:
       - "5432:5432"
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
+    networks:
+      - metric-app-network
 
   redis:
     image: redis:latest
@@ -20,6 +42,14 @@ services:
       - "6379:6379"
     volumes:
       - redis_volume:/data
+    networks:
+      - metric-app-network
+
 
 volumes:
   redis_volume:
+
+
+networks:
+  metric-app-network:
+    driver: bridge
