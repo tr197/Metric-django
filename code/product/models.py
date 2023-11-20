@@ -104,4 +104,16 @@ class ProductOptions(models.Model):
         db_table = 'product_option'
         
         
-                
+class ProductComments(models.Model):
+    product = models.ForeignKey(Product, related_name='comments', on_delete=models.CASCADE)
+    username = models.CharField(max_length=30, blank=False, null=False)
+    content = models.TextField(blank=False, null=False)
+    create_date = models.DateField(auto_now_add=True)
+    update_date = models.DateField(auto_now=True)
+    
+    
+    class Meta:
+        db_table = 'product_comment'
+        
+    def __str__(self) -> str:
+        return f'{self.username} -> {self.content[:30]}'
