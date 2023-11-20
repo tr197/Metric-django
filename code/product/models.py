@@ -1,8 +1,10 @@
 import uuid
+from django.core.validators import MinValueValidator 
 from django.db import models
 from django.db.models import Min
 from django.utils.text import slugify
 from app.settings import APP_URL
+from shop.models import Platform
 
 
 class GeneralInfo(models.Model):
@@ -92,8 +94,11 @@ class ProductImages(models.Model):
 class ProductOptions(models.Model):
     product = models.ForeignKey(Product, related_name='options', on_delete=models.CASCADE)
     name = models.CharField(null=True, blank=True)
-    description = models.CharField(max_length=255, null=True, blank=True)
+    # description = models.CharField(max_length=255, null=True, blank=True)
     price = models.IntegerField(null=True, blank=True, default=999999999)
+    sale_count = models.IntegerField(null=False, blank=True, default=0, validators=[MinValueValidator(0)])
+    platform = models.ForeignKey(Platform, null=True, blank=False, on_delete=models.PROTECT)
+    link = models.CharField(null=False, blank=False, default='/')
 
     class Meta:
         db_table = 'product_option'

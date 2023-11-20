@@ -91,3 +91,4 @@ db.sqlite3
 media/
 code/product/migrations/*
 code/account/migrations/*
+code/shop/migrations/*

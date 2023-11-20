@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from product.models import Category, CategorySub, Product, ProductOptions
-
+from shop.serializeres import PlatformSerializer
 
 class CategorySubSerializer(serializers.ModelSerializer):
     class Meta:
@@ -30,9 +30,11 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class ProductOptionSerializer(serializers.ModelSerializer):
+    
+    platform = PlatformSerializer(many=False)
     class Meta:
         model = ProductOptions
-        fields = ['name', 'description', 'price']
+        fields = ['name', 'platform', 'price', 'sale_count', 'link']
         
         
 class ProductDetailSerializer(serializers.ModelSerializer):
