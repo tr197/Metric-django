@@ -1,19 +1,29 @@
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.cache import cache
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
 from product.models import Category, CategorySub, Product
 from product.serializeres import CategorySerializer, ProductSerializer, ProductDetailSerializer
+from product.constants import DataKey
+
 
 
 class ListCategory(APIView):
     
     def get(self, request):
         try:
-            categories = Category.objects.all()
-            serializers = CategorySerializer(categories, many=True)
-            data = { 'categories': serializers.data }
+            cache_key = DataKey.CATEGORY_LIST.value
+            if cache_key in cache:
+                data = cache.get(cache_key)
+            else:
+                categories = Category.objects.all()
+                serializers = CategorySerializer(categories, many=True)
+                data = { 'categories': serializers.data }
+                cache.set(cache_key, data, timeout=3600)
+                
             return Response(data, status=status.HTTP_200_OK)
         except Exception as e:
             print('[erorr] [-ListCategory-API-]')

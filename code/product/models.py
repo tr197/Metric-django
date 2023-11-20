@@ -1,11 +1,13 @@
 import uuid
-from django.core.validators import MinValueValidator 
+from django.core.validators import MinValueValidator
+from django.core.cache import cache
+
 from django.db import models
 from django.db.models import Min
 from django.utils.text import slugify
 from app.settings import APP_URL
 from shop.models import Platform
-
+from product.constants import DataKey
 
 class GeneralInfo(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -29,6 +31,10 @@ class CategoryBase(GeneralInfo):
 
     class Meta:
         db_table = 'category_base'
+        
+    def save(self, *args, **kwargs):
+        cache.delete(DataKey.CATEGORY_LIST.value)
+        return super().save(*args, **kwargs)
 
 
 class Category(CategoryBase):
